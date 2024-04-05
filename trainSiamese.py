@@ -9,8 +9,8 @@ from models.TripletLoss import TripletLoss
 from models.FaceEncoderResnet import FaceEncoderResnet
 
 from utils.log import log
-from utils.batch import triplet_collate_fn
-from utils.epoch import train_net, valid_net
+from utils.batch import siamese_collate_fn
+from utils.epoch import train_siamese_net, valid_siamese_net
 
 from settings import settings
 from torch.utils.data import random_split, DataLoader
@@ -25,14 +25,14 @@ def main(args):
     train_dataloader = DataLoader(
         train_ds, 
         batch_size=int(settings.batch_size), 
-        collate_fn=triplet_collate_fn, 
+        collate_fn=siamese_collate_fn, 
         shuffle=True
     )
 
     valid_dataloader = DataLoader(
         valid_ds, 
         batch_size=int(settings.batch_size), 
-        collate_fn=triplet_collate_fn, 
+        collate_fn=siamese_collate_fn, 
         shuffle=False
     )
 
@@ -44,15 +44,15 @@ def main(args):
     model.to(settings.device)
     log(model)
 
-    optimizer = optim.Adam(model.parameters(), lr=float(settings.lr), weight_decay=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=float(settings.siamese_lr), weight_decay=1e-3)
     # lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.75, verbose=False)
 
     # train 
     best_triplet_loss = 1e9
     train_history, valid_history = [], []
-    for epoch in range(int(settings.epochs)):
-        train_history.append(train_net(model, train_dataloader, optimizer, epoch))
-        valid_history.append(valid_net(model, valid_dataloader, epoch))
+    for epoch in range(int(settings.siamese_epochs)):
+        train_history.append(train_siamese_net(model, train_dataloader, optimizer, epoch))
+        valid_history.append(valid_siamese_net(model, valid_dataloader, epoch))
 
         # save best 
         if valid_history[-1]["triplet_loss"] < best_triplet_loss:

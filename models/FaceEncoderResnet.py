@@ -1,5 +1,5 @@
 import torch.nn as nn
-from torchvision.models.resnet import resnet18
+from torchvision.models.resnet import resnet18, ResNet18_Weights
 from torchvision.models.feature_extraction import create_feature_extractor
 
 class FaceEncoderResnet(nn.Module):
@@ -9,7 +9,7 @@ class FaceEncoderResnet(nn.Module):
             "layer4.1.bn2": "features"
         }
 
-        resnet = resnet18(pretrained=True)
+        resnet = resnet18(weights=ResNet18_Weights.DEFAULT)
         self.cnn = create_feature_extractor(resnet, return_nodes=return_nodes)
 
         self.fc = nn.Linear(512 * 7 * 6 , hidden_dim)

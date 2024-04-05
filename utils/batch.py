@@ -8,7 +8,7 @@ def process_image(img):
     img = img.float()
     return img
 
-def triplet_collate_fn(batch):
+def siamese_collate_fn(batch):
     batch_img1, batch_img2, batch_img3 = [] ,[], []
     for triple_data in batch:
         img1 = cv2.imread(triple_data[0])
@@ -33,3 +33,18 @@ def triplet_collate_fn(batch):
     batch_img2 = torch.stack(batch_img2)
     batch_img3 = torch.stack(batch_img3)
     return (batch_img1, batch_img2, batch_img3)
+
+def classifier_collate_fn(batch):
+    batch_img, batch_lbl = [], []
+    for data in batch:
+        img = cv2.imread(data[0])
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = process_image(img)
+
+        lbl = int(data[1])
+        batch_img.append(img)
+        batch_lbl.append(lbl)
+    
+    batch_img = torch.stack(batch_img).to(settings.device)
+    batch_lbl = torch.tensor(batch_lbl).to(settings.device)
+    return (batch_img, batch_lbl)
