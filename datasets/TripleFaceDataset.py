@@ -8,6 +8,9 @@ class TripleFaceDataset(Dataset):
         super().__init__()
 
         ids = os.listdir(img_path)
+        
+        # remove hidden files
+        ids = [i for i in ids if not i.startswith(".")]
 
         self.triplets = [] 
         for faceid in ids:
