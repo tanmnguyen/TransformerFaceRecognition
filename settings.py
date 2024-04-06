@@ -16,7 +16,7 @@ class Settings:
         self.config_dict = read_config(config_path)
 
         # set device config 
-        self.config_dict['device'] = 'cuda' if torch.cuda.is_available() else 'mps' 
+        self.config_dict['device'] = 'cuda' if torch.cuda.is_available() else 'cpu' 
 
         # set save path config 
         self.config_dict['result_path'] = os.path.join(

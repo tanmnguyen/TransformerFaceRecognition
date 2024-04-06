@@ -56,8 +56,8 @@ def main(args):
     best_triplet_loss = float("inf")
     train_history, valid_history = [], []
     for epoch in range(int(settings.siamese_epochs)):
-        train_history.append(train_siamese_net(model, train_dataloader, optimizer, epoch))
-        valid_history.append(valid_siamese_net(model, valid_dataloader, epoch))
+        train_history.append(train_siamese_net(model, train_dataloader, optimizer, epoch, settings.siamese_epochs))
+        valid_history.append(valid_siamese_net(model, valid_dataloader, epoch, settings.siamese_epochs))
 
         # save best 
         if valid_history[-1]["triplet_loss"] < best_triplet_loss:
