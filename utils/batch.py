@@ -2,9 +2,14 @@ import cv2
 import torch 
 from settings import settings 
 
+from .imgprocessing import letterbox_resize
+
 def process_image(img):
-    # do something with the image
+    # resize image 
+    img = letterbox_resize(img, int(settings.image_height), int(settings.image_width))
+    # convert to tensor
     img = torch.from_numpy(img).permute(2, 0, 1)
+    # to float type 
     img = img.float()
     return img
 
@@ -32,6 +37,7 @@ def siamese_collate_fn(batch):
     batch_img1 = torch.stack(batch_img1)
     batch_img2 = torch.stack(batch_img2)
     batch_img3 = torch.stack(batch_img3)
+
     return (batch_img1, batch_img2, batch_img3)
 
 def classifier_collate_fn(batch):
@@ -47,4 +53,5 @@ def classifier_collate_fn(batch):
     
     batch_img = torch.stack(batch_img).to(settings.device)
     batch_lbl = torch.tensor(batch_lbl).to(settings.device)
+
     return (batch_img, batch_lbl)

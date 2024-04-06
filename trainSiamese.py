@@ -6,6 +6,7 @@ import torch.optim as optim
 
 from models.SiameseNet import SiameseNet
 from models.TripletLoss import TripletLoss
+from models.FaceEncoderDAT import FaceEncoderDat
 from models.FaceEncoderResnet import FaceEncoderResnet
 
 from utils.log import log
@@ -39,6 +40,8 @@ def main(args):
     # load model 
     if settings.arch == "resnet18":
         encoder = FaceEncoderResnet
+    elif settings.arch == "dat":
+        encoder = FaceEncoderDat
     
     model = SiameseNet(encoder=encoder(), loss=TripletLoss())
     model.to(settings.device)

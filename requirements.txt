@@ -3,3 +3,6 @@ torch==2.2.0
 torchvision==0.17.0
 opencv-python
 torchmetrics
+timm
+einops
+natten==0.14.6
