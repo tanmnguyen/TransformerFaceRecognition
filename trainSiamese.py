@@ -44,9 +44,10 @@ def main(args):
     model.to(settings.device)
 
     log(model)
-    print("Train set size: ", len(train_ds))
-    print("Valid set size: ", len(valid_ds))
-    print("Parameters: ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+    log("Train set size: ", len(train_ds))
+    log("Valid set size: ", len(valid_ds))
+    log(f"Device: {settings.device}")
+    log(f"Parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
     optimizer = optim.Adam(model.parameters(), lr=float(settings.siamese_lr), weight_decay=1e-3)
     # lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.75, verbose=False)
