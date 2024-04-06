@@ -44,8 +44,8 @@ def main(args):
     model.to(settings.device)
 
     log(model)
-    log("Train set size: ", len(train_ds))
-    log("Valid set size: ", len(valid_ds))
+    log(f"Train set size: {len(train_ds)}")
+    log(f"Valid set size: {len(valid_ds)}")
     log(f"Device: {settings.device}")
     log(f"Parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
