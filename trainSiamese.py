@@ -68,7 +68,7 @@ def main(args):
             torch.save(model.state_dict(), os.path.join(f"{settings.result_path}", "best_siamese_net.pth"))
 
         # save every epoch 
-        torch.save(model.state_dict(), os.path.join(f"{settings.result_path}", "siamese_net_epoch_{epoch}.pth"))
+        torch.save(model.state_dict(), os.path.join(f"{settings.result_path}", f"siamese_net_epoch_{epoch}.pth"))
 
     log(f"Best Triplet Loss: {best_triplet_loss}")
     
