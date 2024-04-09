@@ -312,3 +312,12 @@ class DAT(nn.Module):
         x = torch.flatten(x, 1)
         x = self.cls_head(x)
         return x
+    
+    def extract_features(self, x):
+        x = self.patch_proj(x)
+        for i in range(4):
+            x = self.stages[i](x)
+            if i < 3:
+                x = self.down_projs[i](x)
+
+        return x

@@ -41,7 +41,7 @@ def main(args):
     if settings.arch == "resnet18":
         encoder = FaceEncoderResnet()
     elif settings.arch == "dat":
-        encoder = FaceEncoderDat(encoder_weight_path=settings.encoder_weight_path)
+        encoder = FaceEncoderDat(encoder_weight_path=settings.encoder_weight_path, hidden_dim=512 * 7 * 7)
 
     model = SiameseNet(encoder=encoder, loss=TripletLoss())
     model.to(settings.device)

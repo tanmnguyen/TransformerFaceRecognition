@@ -2,7 +2,6 @@ import sys
 sys.path.append('../')
 
 import torch 
-import settings 
 import torch.nn as nn
 
 from .DAT.dat import DAT
@@ -102,8 +101,18 @@ class FaceEncoderDat(nn.Module):
             drop_path_rate = drop_path_rate
         )
 
-        self.data = load_state_dict(self.dat, encoder_weight_path)
+        # load pretrained weight 
+        self.dat = load_state_dict(self.dat, encoder_weight_path)
+
+        # self.fc = nn.Linear(512 * 7 * 7 , hidden_dim)
 
     def forward(self, x):
-        x = self.dat(x)
+        # x = self.dat(x)
+        # features = self.dat_feature_extractor(x)['features']
+
+        # extract features
+        features = self.dat.extract_features(x)
+
+        x = features.view(features.size(0), -1)
+        # x = self.fc(x)
         return x
