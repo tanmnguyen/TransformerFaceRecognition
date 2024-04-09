@@ -28,7 +28,7 @@ def valid_classifier_net(model, valid_dataloader, epoch):
 def train_siamese_net(model, train_dataloader, optimizer, epoch, total_epochs):
     model.train()
     epoch_loss, epoch_acc = 0.0, 0.0
-    for triplet in tqdm(train_dataloader):
+    for i, triplet in enumerate(tqdm(train_dataloader)):
         img1, img2, img3 = triplet 
         optimizer.zero_grad()
         
@@ -42,6 +42,11 @@ def train_siamese_net(model, train_dataloader, optimizer, epoch, total_epochs):
         # compute triplet accuracy 
         triplet_acc = (dis_pos < dis_neg).sum().item() / len(dis_pos)
         epoch_acc += triplet_acc    
+
+        if i % 100 == 0:
+            log(f"[Train] Epoch {epoch+1}/{total_epochs}, \
+                Batch {i}/{len(train_dataloader)}, Loss: {epoch_loss / (i + 1)}, Acc: {epoch_acc / (i + 1)}")
+
 
     log(f"[Train] Epoch {epoch+1}/{total_epochs}, Loss: {epoch_loss/len(train_dataloader)}, Acc: {epoch_acc/len(train_dataloader)}")
 
