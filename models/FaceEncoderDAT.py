@@ -1,10 +1,42 @@
 import sys
 sys.path.append('../')
 
+import torch 
 import settings 
 import torch.nn as nn
 
 from .DAT.dat import DAT
+
+def load_state_dict(model, weight_path):
+    """
+    Load a model's state dictionary while handling size mismatches.
+
+    Parameters:
+        model (torch.nn.Module): The model to load the state dictionary into.
+        weight_path (str): The path to the saved state dictionary.
+    """
+    # Load the state dictionary while ignoring size mismatches
+    loaded_state_dict = torch.load(weight_path, map_location=torch.device('cpu'))['model']
+
+    # Get the current model state dictionary
+    current_state_dict = model.state_dict()
+    # print(model)
+    # Update the current state dictionary with parameters from the loaded state dictionary,
+    # while ignoring any size mismatches
+    for name, param in loaded_state_dict.items():
+        if name in current_state_dict:
+            if param.size() != current_state_dict[name].size():
+                print(f"Ignoring size mismatch for parameter '{name}'")
+                continue
+            current_state_dict[name].copy_(param)
+        else:
+            print(f"Ignoring parameter {name} because it is not in the model's state dictionary")
+
+    # Load the updated state dictionary into the model
+    model.load_state_dict(current_state_dict)
+
+    return model 
+
 
 class FaceEncoderDat(nn.Module):
     def __init__(self,  
@@ -38,12 +70,14 @@ class FaceEncoderDat(nn.Module):
             attn_drop_rate=0.0,
             drop_path_rate=0.2,
             hidden_dim=512,
+            encoder_weight_path=None
     ):
         super().__init__()
         self.dat = DAT(
             img_size = img_size,
             patch_size = patch_size,
             num_classes = hidden_dim, # hidden dim
+            # num_classes=num_classes,
             expansion = expansion,
             dim_stem = dim_stem, 
             dims = dims,
@@ -67,6 +101,8 @@ class FaceEncoderDat(nn.Module):
             attn_drop_rate = attn_drop_rate,
             drop_path_rate = drop_path_rate
         )
+
+        self.data = load_state_dict(self.dat, encoder_weight_path)
 
     def forward(self, x):
         x = self.dat(x)

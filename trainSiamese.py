@@ -39,11 +39,15 @@ def main(args):
 
     # load model 
     if settings.arch == "resnet18":
-        encoder = FaceEncoderResnet
+        encoder = FaceEncoderResnet()
     elif settings.arch == "dat":
-        encoder = FaceEncoderDat
+        encoder = FaceEncoderDat(encoder_weight_path=settings.encoder_weight_path)
+        # load pre-trained weights
+
+    return 
+
     
-    model = SiameseNet(encoder=encoder(), loss=TripletLoss())
+    model = SiameseNet(encoder=encoder, loss=TripletLoss())
     model.to(settings.device)
 
     log(model)
