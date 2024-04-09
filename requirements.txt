@@ -1,6 +1,6 @@
 tqdm
-torch==2.2.0
-torchvision==0.17.0
+torch
+torchvision
 opencv-python
 torchmetrics
 timm
