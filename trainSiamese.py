@@ -42,11 +42,7 @@ def main(args):
         encoder = FaceEncoderResnet()
     elif settings.arch == "dat":
         encoder = FaceEncoderDat(encoder_weight_path=settings.encoder_weight_path)
-        # load pre-trained weights
 
-    return 
-
-    
     model = SiameseNet(encoder=encoder, loss=TripletLoss())
     model.to(settings.device)
 
