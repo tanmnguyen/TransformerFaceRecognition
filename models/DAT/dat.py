@@ -311,4 +311,4 @@ class DAT(nn.Module):
         x = F.adaptive_avg_pool2d(x, 1)
         x = torch.flatten(x, 1)
         x = self.cls_head(x)
-        return x, None, None
+        return x

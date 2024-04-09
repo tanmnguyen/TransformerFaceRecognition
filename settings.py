@@ -10,13 +10,12 @@ def get_time():
 class Settings:
     def __init__(self, config_path=None):
         if config_path:
-            self.set_config(config_path)
+            self.config_dict = read_config(config_path)
+            self._set_config()
     
-    def set_config(self, config_path):
-        self.config_dict = read_config(config_path)
-
+    def _set_config(self):
         # set device config 
-        self.config_dict['device'] = 'cuda' if torch.cuda.is_available() else 'cpu' 
+        self.config_dict['device'] = 'cuda' if torch.cuda.is_available() else 'mps'
 
         # set save path config 
         self.config_dict['result_path'] = os.path.join(
@@ -24,11 +23,10 @@ class Settings:
             f"{self.config_dict['arch']}-{get_time()}"
         )
 
-        os.makedirs(self.config_dict['result_path'], exist_ok=True)
-
     def update_config(self, config_path):
         new_config = read_config(config_path)
         self.config_dict.update(new_config)
+        self._set_config()
 
     def __getattr__(self, name):
         return self.config_dict[name]

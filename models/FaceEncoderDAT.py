@@ -70,5 +70,5 @@ class FaceEncoderDat(nn.Module):
         )
 
     def forward(self, x):
-        x = self.dat(x)[0]
+        x = self.dat(x)
         return x

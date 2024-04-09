@@ -18,7 +18,7 @@ class FaceEncoderResnet(nn.Module):
         # extract features 
         x = self.cnn(x)['features']
         x = self.dropout(x)
-
+        
         # map to latent space 
         x = x.view(x.size(0), -1)
         x = self.fc(x)
