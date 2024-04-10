@@ -112,6 +112,6 @@ class FaceEncoderDat(nn.Module):
 
         # map to latent feature 
         x = torch.flatten(features, 1)
-        x = self.fc(x)
+        # x = self.fc(x)
         
         return x
