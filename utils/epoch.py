@@ -25,7 +25,7 @@ def train_classifier_net(model, train_dataloader, optimizer, epoch, total_epochs
 def valid_classifier_net(model, valid_dataloader, epoch):  
     pass
 
-def train_siamese_net(model, train_dataloader, optimizer, epoch, total_epochs):
+def train_siamese_net(model, train_dataloader, optimizer, scheduler, epoch, total_epochs):
     model.train()
     epoch_loss, epoch_acc = 0.0, 0.0
     for i, triplet in enumerate(tqdm(train_dataloader)):
@@ -36,6 +36,7 @@ def train_siamese_net(model, train_dataloader, optimizer, epoch, total_epochs):
         loss, dis_pos, dis_neg = model(img1, img2, img3)
         loss.backward()
         optimizer.step()
+        scheduler.step()
 
         epoch_loss += loss.item()
 
@@ -44,8 +45,12 @@ def train_siamese_net(model, train_dataloader, optimizer, epoch, total_epochs):
         epoch_acc += triplet_acc    
 
         if i % 100 == 0:
-            log(f"[Train] Epoch {epoch+1}/{total_epochs}, \
-                Batch {i}/{len(train_dataloader)}, Loss: {epoch_loss / (i + 1)}, Acc: {epoch_acc / (i + 1)}")
+            log(f"[Train] Epoch {epoch+1}/{total_epochs}: " + \
+                f"Batch {i}/{len(train_dataloader)} " +\
+                f"| Loss: {epoch_loss / (i + 1)} " +\
+                f"| Acc: {epoch_acc / (i + 1)} " + \
+                f"| LR: {scheduler.get_last_lr()[0]}"
+            )
 
 
     log(f"[Train] Epoch {epoch+1}/{total_epochs}, Loss: {epoch_loss/len(train_dataloader)}, Acc: {epoch_acc/len(train_dataloader)}")
