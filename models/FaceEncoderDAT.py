@@ -75,7 +75,7 @@ class FaceEncoderDat(nn.Module):
         self.dat = DAT(
             img_size = img_size,
             patch_size = patch_size,
-            num_classes = hidden_dim, # hidden dim
+            num_classes = 512 * 7 * 7,
             # num_classes=num_classes,
             expansion = expansion,
             dim_stem = dim_stem, 
@@ -104,11 +104,17 @@ class FaceEncoderDat(nn.Module):
         # load pretrained weight 
         self.dat = load_state_dict(self.dat, encoder_weight_path)
 
+        # fc 
+        self.fc = nn.Linear(512 * 7 * 7, hidden_dim)
+
     def forward(self, x):
         # extract features
         features = self.dat.extract_features(x)
 
         # map to latent feature 
         x = torch.flatten(features, 1)
+
+        # fc
+        x = self.fc(x)
         
         return x
