@@ -41,7 +41,7 @@ def main(args):
     if settings.arch == "resnet18":
         encoder = FaceEncoderResnet()
     elif settings.arch == "dat":
-        encoder = FaceEncoderDat(encoder_weight_path=settings.encoder_weight_path, hidden_dim=512 * 7 * 7)
+        encoder = FaceEncoderDat(encoder_weight_path=settings.encoder_weight_path, hidden_dim=512)
 
     model = SiameseNet(encoder=encoder, loss=TripletLoss())
     model.to(settings.device)
@@ -53,7 +53,7 @@ def main(args):
     log(f"Parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
     optimizer = optim.Adam(model.parameters(), lr=float(settings.siamese_lr), weight_decay=1e-3)
-    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=len(train_dataloader), gamma=0.8)
+    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=len(train_dataloader) * 2, gamma=0.8)
 
     # train 
     best_triplet_loss = float("inf")
