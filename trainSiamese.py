@@ -8,7 +8,7 @@ from models.SiameseNet import SiameseNet
 from models.TripletLoss import TripletLoss
 from models.FaceEncoderDAT import FaceEncoderDat
 from models.FaceEncoderResnet import FaceEncoderResnet
-
+from models.FaceEncoderResNetDat import FaceEncoderResnetDat
 from utils.log import log
 from utils.batch import siamese_collate_fn
 from utils.epoch import train_siamese_net, valid_siamese_net
@@ -42,6 +42,9 @@ def main(args):
         encoder = FaceEncoderResnet()
     elif settings.arch == "dat":
         encoder = FaceEncoderDat(encoder_weight_path=settings.encoder_weight_path, hidden_dim=512)
+    elif settings.arch == "resnet_dat":
+        encoder = FaceEncoderResnetDat()
+
 
     model = SiameseNet(encoder=encoder, loss=TripletLoss())
     model.to(settings.device)

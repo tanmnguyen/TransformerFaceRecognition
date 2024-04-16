@@ -11,6 +11,10 @@ Train neighborhood attention deformable model
 ```bash 
 CUDA_VISIBLE_DEVICES=1 python trainSiamese.py --config configs/CelebA-dat.cfg
 ```
+Train resnet neighborhood attention deformable model 
+```bash 
+CUDA_VISIBLE_DEVICES=1 python trainSiamese.py --config configs/CelebA-resnet_dat.cfg
+```
 Train classifier model
 ```bash
 python trainClassifier.py --config configs/CelebA.cfg --encoder-weight /Users/tan/Desktop/TransformerFaceRecognition/results/resnet18-2024-03-20-00-18-11/best_siamese_net.pth
