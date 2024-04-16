@@ -42,10 +42,10 @@ class FaceEncoderResnetDat(nn.Module):
         x, _, _ = self.nat1(x) 
         x, _, _ = self.dat1(x)
         x = self.conv_down(x)
-        x = self.max_pool(x)
-        x, _, _ = self.nat2(x)
-        x, _, _ = self.dat2(x)
-        x = self.conv_out(x)
+        # x = self.max_pool(x)
+        # x, _, _ = self.nat2(x)
+        # x, _, _ = self.dat2(x)
+        # x = self.conv_out(x)
 
         x = torch.flatten(x, 1)
         
