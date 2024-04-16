@@ -9,7 +9,9 @@ from models.TripletLoss import TripletLoss
 from models.FaceEncoderDAT import FaceEncoderDat
 from models.FaceEncoderResnet import FaceEncoderResnet
 from models.FaceEncoderResNetDat import FaceEncoderResnetDat
+
 from utils.log import log
+from utils.selection import get_encoder
 from utils.batch import siamese_collate_fn
 from utils.epoch import train_siamese_net, valid_siamese_net
 
@@ -20,8 +22,9 @@ from datasets.TripleFaceDataset import TripleFaceDataset
 def main(args):
     settings.update_config(args.config)
 
-    dataset = TripleFaceDataset(settings.train_path)
-    train_ds, valid_ds = random_split(dataset, [0.9, 0.1])
+    train_ds = TripleFaceDataset(settings.train_path)
+    valid_ds = TripleFaceDataset(settings.valid_path)
+    # train_ds, valid_ds = random_split(dataset, [0.9, 0.1])
 
     train_dataloader = DataLoader(
         train_ds, 
@@ -38,13 +41,7 @@ def main(args):
     )
 
     # load model 
-    if settings.arch == "resnet18":
-        encoder = FaceEncoderResnet()
-    elif settings.arch == "dat":
-        encoder = FaceEncoderDat(encoder_weight_path=settings.encoder_weight_path, hidden_dim=512)
-    elif settings.arch == "resnet_dat":
-        encoder = FaceEncoderResnetDat()
-
+    encoder = get_encoder(settings.arch, settings.encoder_weight_path)
 
     model = SiameseNet(encoder=encoder, loss=TripletLoss())
     model.to(settings.device)

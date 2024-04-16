@@ -19,7 +19,7 @@ def load_state_dict(model, weight_path):
 
     # Get the current model state dictionary
     current_state_dict = model.state_dict()
-    # print(model)
+
     # Update the current state dictionary with parameters from the loaded state dictionary,
     # while ignoring any size mismatches
     for name, param in loaded_state_dict.items():
@@ -36,12 +36,14 @@ def load_state_dict(model, weight_path):
 
     return model 
 
-
+"""
+Default is DAT tiny model 
+"""
 class FaceEncoderDat(nn.Module):
     def __init__(self,  
             img_size=224,
             patch_size=4,
-            num_classes=1000,
+            num_classes=512 * 7 * 7,
             expansion=4,
             dim_stem=64,
             dims=[64, 128, 256, 512],
@@ -68,15 +70,13 @@ class FaceEncoderDat(nn.Module):
             drop_rate=0.0,
             attn_drop_rate=0.0,
             drop_path_rate=0.2,
-            hidden_dim=512,
             encoder_weight_path=None
     ):
         super().__init__()
         self.dat = DAT(
             img_size = img_size,
             patch_size = patch_size,
-            num_classes = 512 * 7 * 7,
-            # num_classes=num_classes,
+            num_classes=num_classes,
             expansion = expansion,
             dim_stem = dim_stem, 
             dims = dims,
@@ -103,7 +103,6 @@ class FaceEncoderDat(nn.Module):
 
         # load pretrained weight 
         self.dat = load_state_dict(self.dat, encoder_weight_path)
-
 
     def forward(self, x):
         # extract features

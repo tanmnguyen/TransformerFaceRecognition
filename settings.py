@@ -29,7 +29,9 @@ class Settings:
         self._set_config()
 
     def __getattr__(self, name):
-        return self.config_dict[name]
+        if name in self.config_dict:
+            return self.config_dict[name]
+        return None 
             
 # set default config 
 settings = Settings("configs/default.cfg")

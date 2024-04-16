@@ -7,7 +7,7 @@ from datasets.FaceDataset import FaceDataset
 from torch.utils.data import random_split, DataLoader
 
 from utils.log import log
-from utils.selection import get_encoder
+from utils.selection import get_encoder_from_siamese
 from utils.batch import classifier_collate_fn
 from utils.epoch import train_classifier_net, valid_classifier_net
 
@@ -33,7 +33,7 @@ def main(args):
         shuffle=False
     )
 
-    encoder = get_encoder(settings.arch, args.encoder_weight)
+    encoder = get_encoder_from_siamese(settings.arch, args.encoder_weight)
     encoder.requires_grad_(False)
 
     # return

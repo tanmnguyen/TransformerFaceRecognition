@@ -37,13 +37,13 @@ class FaceEncoderResnetDat(nn.Module):
 
     def forward(self, x):
         # extract features using CNN backbone 
-        x = self.cnn(x)['features']
+        x0 = self.cnn(x)['features']
 
         # transform features using DAT blocks
-        x, _, _ = self.nat1(x) 
+        x, _, _ = self.nat1(x0) 
         x, _, _ = self.dat1(x)
-        x, _, _ = self.nat2(x)
-        x, _, _ = self.dat2(x)
+        # x, _, _ = self.nat2(x)
+        # x, _, _ = self.dat2(x)
 
         x = self.conv_down(x)
         x = self.max_pool(x)
