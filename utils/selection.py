@@ -92,6 +92,9 @@ def get_encoder(arch: str, weight: str):
                 drop_path_rate=0.7,
                 encoder_weight_path=weight,
             )
+    elif arch == "resnet_dat":
+        from models.FaceEncoderResNetDat import FaceEncoderResnetDat
+        encoder = FaceEncoderResnetDat()
     else:
         raise ValueError(f"arch {arch} not supported")
     

@@ -7,7 +7,7 @@ from .DAT.nat import NeighborhoodAttention2D
 from .DAT.dat_blocks import DAttentionBaseline 
 
 class FaceEncoderResnetDat(nn.Module):
-    def __init__(self, ):
+    def __init__(self):
         super().__init__()
         return_nodes = {
             "layer3.1.bn2": "features"
@@ -41,15 +41,15 @@ class FaceEncoderResnetDat(nn.Module):
 
         # transform features using DAT blocks
         x, _, _ = self.nat1(x0) 
-        x, _, _ = self.dat1(x)
+        # x, _, _ = self.dat1(x)
         # x, _, _ = self.nat2(x)
         # x, _, _ = self.dat2(x)
 
-        x = self.conv_down(x)
-        x = self.max_pool(x)
-        x = self.relu(x)
+        # x = self.conv_down(x)
+        # x = self.max_pool(x)
+        # x = self.relu(x)
 
-        x = self.conv_out(x)
+        # x = self.conv_out(x)
 
         x = torch.flatten(x, 1)
         
