@@ -12,7 +12,7 @@ class FaceEncoderResnet(nn.Module):
         resnet = resnet18(weights=ResNet18_Weights.DEFAULT)
         self.cnn = create_feature_extractor(resnet, return_nodes=return_nodes)
         self.dropout = nn.Dropout(dropout)
-        self.fc = nn.Linear(512 * 7 * 6 , hidden_dim)
+        self.fc = nn.Linear(512 * 7 * 7 , hidden_dim)
 
     def forward(self, x):
         # extract features 
