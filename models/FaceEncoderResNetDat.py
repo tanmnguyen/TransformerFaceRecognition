@@ -52,32 +52,42 @@ class FaceEncoderResnetDat(nn.Module):
             no_off=False, fixed_pe=False, ksize=5, log_cpb=False
         )
 
-        # self.down_proj2 = nn.Sequential(
-        #     nn.Conv2d(256, 512, 3, 2, 1, bias=False),
-        #     LayerNormProxy(512)
-        # )
+        self.down_proj2 = nn.Sequential(
+            nn.Conv2d(256, 512, 3, 2, 1, bias=False),
+            LayerNormProxy(512)
+        )
 
         self.relu = nn.ReLU()
 
-        self.final_conv = resnet.layer4 
+        self.resnetLayer3 = resnet.layer3
+        self.resnetLayer4 = resnet.layer4 
 
 
     def forward(self, x):
         # extract features using CNN backbone 
         x0 = self.cnn(x)['features']
 
-        # transform features using DAT blocks
-        x1, _, _ = self.nat1(x0) 
-        x1, _, x = self.dat1(x1)
-        x1 = self.relu(x0 + x1)
-        x1 = self.down_proj1(x1)
+        # transform features using NAT and DAT blocks
+        x1_transformer, _, _ = self.nat1(x0) 
+        x1_transformer, _, _ = self.dat1(x1_transformer)
+        x1_transformer = self.relu(x0 + x1_transformer)
+        x1_transformer = self.down_proj1(x1_transformer)
 
-        x2, _, _ = self.nat2(x1)
-        x2, _, x = self.dat2(x2)
-        x2 = self.relu(x1 + x2)
-        # x2 = self.down_proj2(x2)
+        # trasnform features using ResNet layer 3
+        x1_resnet = self.resnetLayer3(x0)
+        x1 = self.relu(x1_transformer + x1_resnet)
 
-        x3 = self.final_conv(x2)
-        x3 = torch.flatten(x3, 1)
+        # transform features using NAT and DAT blocks
+        x2_transformer, _, _ = self.nat2(x1)
+        x2_transformer, _, _ = self.dat2(x2_transformer)
+        x2_transformer = self.relu(x1 + x2_transformer)
+        x2_transformer = self.down_proj2(x2_transformer)
+
+        # trasnform features using ResNet layer 4
+        x2_resnet = self.resnetLayer4(x1)
+        x2 = self.relu(x2_transformer + x2_resnet)
+
+        # flatten features
+        out = torch.flatten(x2, 1)
         
-        return x3 
+        return out

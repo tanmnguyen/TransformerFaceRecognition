@@ -44,7 +44,7 @@ def train_siamese_net(model, train_dataloader, optimizer, scheduler, epoch, tota
         triplet_acc = (dis_pos < dis_neg).sum().item() / len(dis_pos)
         epoch_acc += triplet_acc    
 
-        if i % 1g == 0:
+        if i % 1 == 0:
             log(f"[Train] Epoch {epoch+1}/{total_epochs}: " + \
                 f"Batch {i}/{len(train_dataloader)} " +\
                 f"| Loss: {epoch_loss / (i + 1)} " +\
