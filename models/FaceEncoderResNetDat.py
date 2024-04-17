@@ -23,13 +23,17 @@ class LayerNormProxy(nn.Module):
 class FaceEncoderResnetDat(nn.Module):
     def __init__(self, hidden_dim=512, dropout=0.4):
         super().__init__()
-        return_nodes = {
-            "layer2.1.bn2": "features"
-        }
-        
         # CNN backbone 
         resnet = resnet18(weights=ResNet18_Weights.DEFAULT)
-        self.cnn = create_feature_extractor(resnet, return_nodes=return_nodes)
+        self.conv1 = resnet.conv1 
+        self.bn1 = resnet.bn1
+        self.relu = resnet.relu
+        self.maxpool = resnet.maxpool
+
+        self.layer1 = resnet.layer1
+        self.layer2 = resnet.layer2
+        self.layer3 = resnet.layer3
+        self.layer4 = resnet.layer4
 
         self.nat1 = NeighborhoodAttention2D(dim=128, kernel_size=3, num_heads=4, attn_drop=0., proj_drop=0.)
         self.dat1 = DAttentionBaseline(
@@ -57,44 +61,55 @@ class FaceEncoderResnetDat(nn.Module):
             LayerNormProxy(512)
         )
 
-        self.relu = nn.ReLU()
-
-        self.resnetLayer3 = resnet.layer3
-        self.resnetLayer4 = resnet.layer4 
-
         self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(512 * 7 * 7 , hidden_dim)
 
 
     def forward(self, x):
-        # extract features using CNN backbone 
-        x0 = self.cnn(x)['features']
+        # # extract features using CNN backbone 
+        # x0 = self.cnn(x)['features']
 
-        # transform features using NAT and DAT blocks
-        x1_transformer, _, _ = self.nat1(x0) 
-        x1_transformer, _, _ = self.dat1(x1_transformer)
-        x1_transformer = self.relu(x0 + x1_transformer)
-        x1_transformer = self.down_proj1(x1_transformer)
+        # # transform features using NAT and DAT blocks
+        # x1_transformer, _, _ = self.nat1(x0) 
+        # x1_transformer, _, _ = self.dat1(x1_transformer)
+        # x1_transformer = self.relu(x0 + x1_transformer)
+        # x1_transformer = self.down_proj1(x1_transformer)
 
-        # trasnform features using ResNet layer 3
-        x1_resnet = self.resnetLayer3(x0)
-        x1 = self.relu(x1_transformer + x1_resnet)
+        # # trasnform features using ResNet layer 3
+        # x1_resnet = self.resnetLayer3(x0)
+        # x1 = self.relu(x1_transformer + x1_resnet)
 
-        # transform features using NAT and DAT blocks
-        x2_transformer, _, _ = self.nat2(x1)
-        x2_transformer, _, _ = self.dat2(x2_transformer)
-        x2_transformer = self.relu(x1 + x2_transformer)
-        x2_transformer = self.down_proj2(x2_transformer)
+        # # transform features using NAT and DAT blocks
+        # x2_transformer, _, _ = self.nat2(x1)
+        # x2_transformer, _, _ = self.dat2(x2_transformer)
+        # x2_transformer = self.relu(x1 + x2_transformer)
+        # x2_transformer = self.down_proj2(x2_transformer)
 
-        # trasnform features using ResNet layer 4
-        x2_resnet = self.resnetLayer4(x1)
-        x2 = self.relu(x2_transformer + x2_resnet)
+        # # trasnform features using ResNet layer 4
+        # x2_resnet = self.resnetLayer4(x1)
+        # x2 = self.relu(x2_transformer + x2_resnet)
 
-        # flatten features
-        out = torch.flatten(x2, 1)
-        out = self.dropout(out)
+        # # flatten features
+        # out = torch.flatten(x2, 1)
+        # out = self.dropout(out)
+
+        # # map to latent space
+        # out = self.fc(out)
+
+        # cnn backbone 
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
 
         # map to latent space
+        x = self.dropout(x)
+        out = torch.flatten(x, 1)
         out = self.fc(out)
         
         return out
