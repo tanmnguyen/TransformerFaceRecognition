@@ -21,7 +21,7 @@ class LayerNormProxy(nn.Module):
         return einops.rearrange(x, 'b h w c -> b c h w')
     
 class FaceEncoderResnetDat(nn.Module):
-    def __init__(self):
+    def __init__(self, hidden_dim=512, dropout=0.4):
         super().__init__()
         return_nodes = {
             "layer2.1.bn2": "features"
@@ -62,6 +62,9 @@ class FaceEncoderResnetDat(nn.Module):
         self.resnetLayer3 = resnet.layer3
         self.resnetLayer4 = resnet.layer4 
 
+        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(512 * 7 * 7 , hidden_dim)
+
 
     def forward(self, x):
         # extract features using CNN backbone 
@@ -89,5 +92,9 @@ class FaceEncoderResnetDat(nn.Module):
 
         # flatten features
         out = torch.flatten(x2, 1)
+        out = self.dropout(out)
+
+        # map to latent space
+        out = self.fc(out)
         
         return out
