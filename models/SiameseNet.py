@@ -5,11 +5,6 @@ class SiameseNet(nn.Module):
         super(SiameseNet, self).__init__()
         self.encoder = encoder
         self.loss = loss
-        # self.branches = nn.Parallel(
-        #     self.encoder, 
-        #     self.encoder, 
-        #     self.encoder
-        # )
 
     def forward(self, anchor, positive, negative):
         anchor   = self.encoder(anchor)
@@ -19,3 +14,9 @@ class SiameseNet(nn.Module):
         loss = self.loss(anchor, positive, negative)
 
         return loss 
+    
+    def get_param_groups(self, default_lr):
+        try:
+            return self.encoder.get_param_groups()
+        except:
+            return {"params": self.encoder.parameters(), "lr": default_lr}

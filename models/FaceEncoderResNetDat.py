@@ -20,6 +20,31 @@ class LayerNormProxy(nn.Module):
         x = self.norm(x)
         return einops.rearrange(x, 'b h w c -> b c h w')
     
+class NDat(nn.Module):
+    def __init__(self, in_channel, h, w) -> None:
+        super().__init__()
+
+        self.nat = NeighborhoodAttention2D(dim=in_channel, kernel_size=3, num_heads=4, attn_drop=0., proj_drop=0.)
+        self.dat = DAttentionBaseline(
+            q_size=(h,w), kv_size=h, n_heads=4, n_head_channels=in_channel // 4, n_groups=2,
+            attn_drop=0., proj_drop=0., stride=1, 
+            offset_range_factor=3, use_pe=False, dwc_pe=False,
+            no_off=False, fixed_pe=False, ksize=5, log_cpb=False
+        )
+        self.relu = nn.ReLU()
+        self.down_proj = nn.Sequential(
+            nn.Conv2d(in_channel, in_channel * 2, 3, 2, 1, bias=False),
+            LayerNormProxy(in_channel * 2)
+        )
+
+    def forward(self, x):
+        x_transformer, _, _ = self.nat(x)
+        x_transformer, _, _ = self.dat(x_transformer)
+        x_transformer = self.relu(x + x_transformer)
+        x_transformer = self.down_proj(x_transformer)
+
+        return x_transformer
+
 class FaceEncoderResnetDat(nn.Module):
     def __init__(self, hidden_dim=512, dropout=0.4):
         super().__init__()
@@ -31,81 +56,40 @@ class FaceEncoderResnetDat(nn.Module):
         self.maxpool = resnet.maxpool
 
         self.layer1 = resnet.layer1
+
         self.layer2 = resnet.layer2
+        self.ndat2 = NDat(64, 28, 28)
+
         self.layer3 = resnet.layer3
+        self.ndat3 = NDat(128, 14, 14)
+
         self.layer4 = resnet.layer4
-
-        self.nat1 = NeighborhoodAttention2D(dim=128, kernel_size=3, num_heads=4, attn_drop=0., proj_drop=0.)
-        self.dat1 = DAttentionBaseline(
-            q_size=(14,14), kv_size=14, n_heads=4, n_head_channels=128 // 4, n_groups=2,
-            attn_drop=0., proj_drop=0., stride=1, 
-            offset_range_factor=3, use_pe=False, dwc_pe=False,
-            no_off=False, fixed_pe=False, ksize=5, log_cpb=False
-        )
-        
-        self.down_proj1 = nn.Sequential(
-            nn.Conv2d(128, 256, 3, 2, 1, bias=False),
-            LayerNormProxy(256)
-        )
-
-        self.nat2 = NeighborhoodAttention2D(dim=256, kernel_size=3, num_heads=4, attn_drop=0., proj_drop=0.)
-        self.dat2 = DAttentionBaseline(
-            q_size=(14,14), kv_size=14, n_heads=4, n_head_channels=256 // 4, n_groups=2,
-            attn_drop=0., proj_drop=0., stride=1, 
-            offset_range_factor=3, use_pe=False, dwc_pe=False,
-            no_off=False, fixed_pe=False, ksize=5, log_cpb=False
-        )
-
-        self.down_proj2 = nn.Sequential(
-            nn.Conv2d(256, 512, 3, 2, 1, bias=False),
-            LayerNormProxy(512)
-        )
+        self.ndat4 = NDat(256, 7, 7)
 
         self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(512 * 7 * 7 , hidden_dim)
 
 
     def forward(self, x):
-        # # extract features using CNN backbone 
-        # x0 = self.cnn(x)['features']
-
-        # # transform features using NAT and DAT blocks
-        # x1_transformer, _, _ = self.nat1(x0) 
-        # x1_transformer, _, _ = self.dat1(x1_transformer)
-        # x1_transformer = self.relu(x0 + x1_transformer)
-        # x1_transformer = self.down_proj1(x1_transformer)
-
-        # # trasnform features using ResNet layer 3
-        # x1_resnet = self.resnetLayer3(x0)
-        # x1 = self.relu(x1_transformer + x1_resnet)
-
-        # # transform features using NAT and DAT blocks
-        # x2_transformer, _, _ = self.nat2(x1)
-        # x2_transformer, _, _ = self.dat2(x2_transformer)
-        # x2_transformer = self.relu(x1 + x2_transformer)
-        # x2_transformer = self.down_proj2(x2_transformer)
-
-        # # trasnform features using ResNet layer 4
-        # x2_resnet = self.resnetLayer4(x1)
-        # x2 = self.relu(x2_transformer + x2_resnet)
-
-        # # flatten features
-        # out = torch.flatten(x2, 1)
-        # out = self.dropout(out)
-
-        # # map to latent space
-        # out = self.fc(out)
-
-        # cnn backbone 
+        # extract features using CNN backbone 
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
 
         x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
+
+        y = self.layer2(x)
+        z = self.ndat2(x)
+        x = y + z
+
+        y = self.layer3(x)
+        z = self.ndat3(x)
+        x = y + z
+
+        y = self.layer4(x)
+        z = self.ndat4(x)
+        x = y + z
 
         # map to latent space
         x = self.dropout(x)
@@ -113,3 +97,19 @@ class FaceEncoderResnetDat(nn.Module):
         out = self.fc(out)
         
         return out
+    
+    def get_param_groups(self):
+        resnet_lr = 1e-4 
+        ndat_lr = 1e-2
+        return [
+            {"params": self.conv1.parameters(), "lr": resnet_lr},
+            {"params": self.bn1.parameters(), "lr": resnet_lr},
+            {"params": self.layer1.parameters(), "lr": resnet_lr},
+            {"params": self.layer2.parameters(), "lr": resnet_lr},
+            {"params": self.ndat2.parameters(), "lr": ndat_lr},
+            {"params": self.layer3.parameters(), "lr": resnet_lr},
+            {"params": self.ndat3.parameters(), "lr": ndat_lr},
+            {"params": self.layer4.parameters(), "lr": resnet_lr},
+            {"params": self.ndat4.parameters(), "lr": ndat_lr},
+            {"params": self.fc.parameters(), "lr": ndat_lr},
+        ]

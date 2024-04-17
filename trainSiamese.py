@@ -52,7 +52,7 @@ def main(args):
     log(f"Device: {settings.device}")
     log(f"Parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
-    optimizer = optim.Adam(model.parameters(), lr=float(settings.siamese_lr), weight_decay=1e-3)
+    optimizer = optim.Adam(model.get_param_groups(default_lr=float(settings.siamese_lr)), weight_decay=1e-3)
     lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=len(train_dataloader) * 2, gamma=0.8)
 
     # train 
