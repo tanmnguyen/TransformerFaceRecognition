@@ -78,10 +78,7 @@ class FaceEncoderResnetDat(nn.Module):
         x = self.maxpool(x)
 
         x = self.layer1(x)
-
-        y = self.layer2(x)
-        z = self.ndat2(x)
-        x = y + z
+        x = self.layer2(x)
 
         y = self.layer3(x)
         z = self.ndat3(x)
@@ -100,7 +97,7 @@ class FaceEncoderResnetDat(nn.Module):
     
     def get_param_groups(self):
         resnet_lr = 1e-4 
-        ndat_lr = 1e-2
+        ndat_lr = 1e-3
         return [
             {"params": self.conv1.parameters(), "lr": resnet_lr},
             {"params": self.bn1.parameters(), "lr": resnet_lr},

@@ -10,7 +10,6 @@ class SiameseNet(nn.Module):
         anchor   = self.encoder(anchor)
         positive = self.encoder(positive)
         negative = self.encoder(negative)
-        # anchor, positive, negative = self.branches(anchor, positive, negative)
         loss = self.loss(anchor, positive, negative)
 
         return loss 
@@ -19,4 +18,4 @@ class SiameseNet(nn.Module):
         try:
             return self.encoder.get_param_groups()
         except:
-            return {"params": self.encoder.parameters(), "lr": default_lr}
+            return [{"params": self.encoder.parameters(), "lr": default_lr}]

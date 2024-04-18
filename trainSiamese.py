@@ -6,9 +6,6 @@ import torch.optim as optim
 
 from models.SiameseNet import SiameseNet
 from models.TripletLoss import TripletLoss
-from models.FaceEncoderDAT import FaceEncoderDat
-from models.FaceEncoderResnet import FaceEncoderResnet
-from models.FaceEncoderResNetDat import FaceEncoderResnetDat
 
 from utils.log import log
 from utils.selection import get_encoder
@@ -16,7 +13,7 @@ from utils.batch import siamese_collate_fn
 from utils.epoch import train_siamese_net, valid_siamese_net
 
 from settings import settings
-from torch.utils.data import random_split, DataLoader
+from torch.utils.data import DataLoader
 from datasets.TripleFaceDataset import TripleFaceDataset
 
 def main(args):
@@ -24,7 +21,6 @@ def main(args):
 
     train_ds = TripleFaceDataset(settings.train_path)
     valid_ds = TripleFaceDataset(settings.valid_path)
-    # train_ds, valid_ds = random_split(dataset, [0.9, 0.1])
 
     train_dataloader = DataLoader(
         train_ds, 
