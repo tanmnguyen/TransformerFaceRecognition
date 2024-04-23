@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class FaceReconstruction(nn.Module):
-    def __init__(self, in_width, in_height, in_channels, out_channels, out_width, out_height):
+    def __init__(self, enc_len, in_width, in_height, in_channels, out_channels, out_width, out_height):
         super().__init__()
         self.in_width = in_width
         self.in_height = in_height
@@ -11,6 +11,11 @@ class FaceReconstruction(nn.Module):
         self.out_channels = out_channels
         self.out_width = out_width
         self.out_height = out_height
+
+        if enc_len != in_width * in_height * in_channels:
+            self.in_resize = nn.Linear(enc_len, in_width * in_height * in_channels)
+        else:
+            self.in_resize = lambda x: x
 
         # Reshape layer to go from flat vector to (b, 512, 7, 7)
         self.reshape = lambda x: x.view(-1, in_channels, in_height, in_width)
@@ -30,6 +35,7 @@ class FaceReconstruction(nn.Module):
         self.batchnorm4 = nn.BatchNorm2d(32)
 
     def forward(self, x):
+        x = self.in_resize(x)
         x = self.reshape(x)
         x = self.relu(self.batchnorm1(self.deconv1(x)))
         x = self.relu(self.batchnorm2(self.deconv2(x)))
