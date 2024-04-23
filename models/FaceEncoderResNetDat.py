@@ -82,11 +82,11 @@ class FaceEncoderResnetDat(nn.Module):
 
         y = self.layer3(x)
         z = self.ndat3(x)
-        x = y + z
+        x = y + nn.ReLU()(z)
 
         y = self.layer4(x)
         z = self.ndat4(x)
-        x = y + z
+        x = y + nn.ReLU()(z)
 
         # map to latent space
         x = self.dropout(x)

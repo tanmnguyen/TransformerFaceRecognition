@@ -14,7 +14,7 @@ CUDA_VISIBLE_DEVICES=1 python trainSiamese.py --config configs/CelebA-dat-base.c
 ```
 Train resnet neighborhood attention deformable model 
 ```bash 
-CUDA_VISIBLE_DEVICES=1 python trainSiamese.py --config configs/CelebA-resnet_dat.cfg
+CUDA_VISIBLE_DEVICES=0 python trainSiamese.py --config configs/CelebA-resnet_dat.cfg
 ```
 Train classifier model
 ```bash
