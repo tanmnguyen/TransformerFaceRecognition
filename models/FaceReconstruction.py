@@ -12,9 +12,6 @@ class FaceReconstruction(nn.Module):
         self.out_width = out_width
         self.out_height = out_height
 
-        # Fully connected layer to adjust input vector to suitable size
-        self.fc = nn.Linear(in_channels * in_width * in_height, in_channels * in_width * in_height)
-
         # Reshape layer to go from flat vector to (b, 512, 7, 7)
         self.reshape = lambda x: x.view(-1, in_channels, in_height, in_width)
 
@@ -33,7 +30,6 @@ class FaceReconstruction(nn.Module):
         self.batchnorm4 = nn.BatchNorm2d(32)
 
     def forward(self, x):
-        x = self.fc(x)
         x = self.reshape(x)
         x = self.relu(self.batchnorm1(self.deconv1(x)))
         x = self.relu(self.batchnorm2(self.deconv2(x)))
@@ -41,6 +37,10 @@ class FaceReconstruction(nn.Module):
         x = self.relu(self.batchnorm4(self.deconv4(x)))
         x = self.deconv5(x)  # No activation, assuming this is the output layer for an image
         return x
+    
+    def loss(self, output, target):
+        b = output.shape[0]
+        return F.mse_loss(output.contiguous().view(b, -1), target.contiguous().view(b, -1))
 
 # Example usage
 # model = FaceReconstruction(7, 7, 512, 3, 224, 224)

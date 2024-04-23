@@ -15,7 +15,10 @@ def load_state_dict(model, weight_path):
         weight_path (str): The path to the saved state dictionary.
     """
     # Load the state dictionary while ignoring size mismatches
-    loaded_state_dict = torch.load(weight_path, map_location=torch.device('cpu'))['model']
+    try:
+        loaded_state_dict = torch.load(weight_path, map_location=torch.device('cpu'))['model']
+    except KeyError:
+        loaded_state_dict = torch.load(weight_path, map_location=torch.device('cpu'))
 
     # Get the current model state dictionary
     current_state_dict = model.state_dict()
@@ -102,7 +105,8 @@ class FaceEncoderDat(nn.Module):
         )
 
         # load pretrained weight 
-        self.dat = load_state_dict(self.dat, encoder_weight_path)
+        if encoder_weight_path is not None:
+            self.dat = load_state_dict(self.dat, encoder_weight_path)
 
     def forward(self, x):
         # extract features

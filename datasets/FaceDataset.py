@@ -10,6 +10,9 @@ class FaceDataset(Dataset):
 
         self.lbl, self.img_path = [], []
         for faceid in ids:
+            # check if it is a directory
+            if not os.path.isdir(os.path.join(img_path, faceid)):
+                continue
             files = os.listdir(os.path.join(img_path, faceid))
             for file in files:
                 self.lbl.append(faceid)

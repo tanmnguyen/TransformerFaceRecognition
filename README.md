@@ -21,3 +21,7 @@ Train classifier model
 python trainClassifier.py --config configs/CelebA.cfg --encoder-weight /Users/tan/Desktop/TransformerFaceRecognition/results/resnet18-2024-03-20-00-18-11/best_siamese_net.pth
 ```
 
+## Train reconstruction net 
+```bash 
+python trainReconstruction.py --config configs/CelebA-dat-tiny-recon.cfg
+```
