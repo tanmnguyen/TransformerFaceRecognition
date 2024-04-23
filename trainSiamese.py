@@ -6,12 +6,12 @@ import torch.optim as optim
 
 from models.SiameseNet import SiameseNet
 from models.TripletLoss import TripletLoss
+from models.FaceReconstruction import FaceReconstruction
 
 from utils.log import log
 from utils.selection import get_encoder
 from utils.batch import siamese_collate_fn
 from utils.epoch import train_siamese_net, valid_siamese_net
-
 from settings import settings
 from torch.utils.data import DataLoader
 from datasets.TripleFaceDataset import TripleFaceDataset
@@ -38,8 +38,9 @@ def main(args):
 
     # load model 
     encoder = get_encoder(settings.arch, settings.encoder_weight_path)
+    face_reconstruction = FaceReconstruction(7, 7, 512, 3, 224, 224)
 
-    model = SiameseNet(encoder=encoder, loss=TripletLoss())
+    model = SiameseNet(encoder=encoder, loss=TripletLoss(), face_reconstruction=face_reconstruction)
     model.to(settings.device)
 
     log(model)
@@ -52,21 +53,13 @@ def main(args):
     lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=len(train_dataloader) * 2, gamma=0.8)
 
     # train 
-    best_triplet_loss = float("inf")
     train_history, valid_history = [], []
     for epoch in range(int(settings.siamese_epochs)):
         train_history.append(train_siamese_net(model, train_dataloader, optimizer, lr_scheduler, epoch, settings.siamese_epochs))
         valid_history.append(valid_siamese_net(model, valid_dataloader, epoch, settings.siamese_epochs))
 
-        # save best 
-        if valid_history[-1]["triplet_loss"] < best_triplet_loss:
-            best_triplet_loss = valid_history[-1]["triplet_loss"]
-            torch.save(model.state_dict(), os.path.join(f"{settings.result_path}", "best_siamese_net.pth"))
-
         # save every epoch 
         torch.save(model.state_dict(), os.path.join(f"{settings.result_path}", f"siamese_net_epoch_{epoch}.pth"))
-
-    log(f"Best Triplet Loss: {best_triplet_loss}")
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
