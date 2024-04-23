@@ -29,7 +29,7 @@ def train_recon_net(model, encoder, train_dataloader, optimizer, scheduler, epoc
     model.train() 
 
     epoch_loss = 0.0
-    for i, img, _ in enumerate(tqdm(train_dataloader)):
+    for i, (img, _) in enumerate(tqdm(train_dataloader)):
         optimizer.zero_grad()
 
         with torch.no_grad():

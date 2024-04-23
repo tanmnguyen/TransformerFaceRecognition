@@ -39,7 +39,7 @@ def main(args):
     # load model 
     encoder = get_encoder_from_siamese(settings.arch, settings.encoder_weight_path)
     # reconstruction model
-    model = FaceReconstruction(7, 7, 512, 3, 224, 224)
+    model = FaceReconstruction(7, 7, 512, 3, 224, 224).to(settings.device)
 
     log(model)
     log(f"Train set size: {len(train_ds)}")
