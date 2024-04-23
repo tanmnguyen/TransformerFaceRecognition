@@ -38,6 +38,9 @@ def main(args):
 
     # load model 
     encoder = get_encoder_from_siamese(settings.arch, settings.encoder_weight_path)
+    encoder = encoder.to(settings.device)
+    encoder.requires_grad_(False)
+    
     # reconstruction model
     model = FaceReconstruction(7, 7, 512, 3, 224, 224).to(settings.device)
 
