@@ -33,8 +33,7 @@ def train_siamese_net(model, train_dataloader, optimizer, scheduler, epoch, tota
         optimizer.zero_grad()
         
         # forward pass
-        loss, dis_pos, dis_neg, triplet_loss, recon_loss = model(img1, img2, img3)
-        loss.backward()
+        loss, dis_pos, dis_neg, triplet_loss, recon_loss = model(img1, img2, img3, beta=0.2, backward=True)       
         optimizer.step()
         scheduler.step()
 
@@ -55,6 +54,8 @@ def train_siamese_net(model, train_dataloader, optimizer, scheduler, epoch, tota
                 f"| Recon Loss: {epoch_recon_loss / (i + 1)} " + \
                 f"| LR: {scheduler.get_last_lr()[0]}"
             )
+
+        torch.cuda.empty_cache()
 
 
     log(f"[Train] Epoch {epoch+1}/{total_epochs}: " + \
@@ -80,7 +81,7 @@ def valid_siamese_net(model, valid_dataloader, epoch, total_epochs):
     with torch.no_grad():
         for triplet in tqdm(valid_dataloader):
             img1, img2, img3 = triplet 
-            loss, dis_pos, dis_neg, triplet_loss, recon_loss = model(img1, img2, img3)
+            loss, dis_pos, dis_neg, triplet_loss, recon_loss = model(img1, img2, img3, beta=0.2, backward=False)
 
             epoch_loss += loss.item()
             epoch_triplet_loss += triplet_loss.item()
@@ -89,6 +90,8 @@ def valid_siamese_net(model, valid_dataloader, epoch, total_epochs):
             # compute triplet accuracy 
             triplet_acc = (dis_pos < dis_neg).sum().item() / len(dis_pos)
             epoch_acc += triplet_acc
+
+            torch.cuda.empty_cache()
     
     log(f"[Valid] Epoch {epoch+1}/{total_epochs}: " + \
         f"| Loss: {epoch_loss / len(valid_dataloader)} " +\
