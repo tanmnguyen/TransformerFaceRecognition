@@ -45,7 +45,7 @@ def train_recon_net(model, encoder, train_dataloader, optimizer, scheduler, epoc
             epoch_loss += loss.item()
 
         if i % 50 == 0:
-            log(f"[Train] Epoch {epoch+1}/{total_epochs}, Loss: {epoch_loss/len(train_dataloader)}")
+            log(f"[Train] Epoch {epoch+1}/{total_epochs}, Loss: {epoch_loss/(i + 1)}")
 
     log(f"[Train] Epoch {epoch+1}/{total_epochs}, Loss: {epoch_loss/len(train_dataloader)}")
     return {

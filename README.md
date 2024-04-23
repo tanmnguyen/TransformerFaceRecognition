@@ -25,3 +25,7 @@ python trainClassifier.py --config configs/CelebA.cfg --encoder-weight /Users/ta
 ```bash 
 CUDA_VISIBLE_DEVICES=0 python trainReconstruction.py --config configs/CelebA-dat-tiny-recon.cfg
 ```
+
+```bash 
+CUDA_VISIBLE_DEVICES=0 python trainReconstruction.py --config configs/CelebA-resnet_dat-recon.cfg
+```
