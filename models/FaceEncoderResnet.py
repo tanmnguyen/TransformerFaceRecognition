@@ -3,7 +3,7 @@ from torchvision.models.resnet import resnet18, ResNet18_Weights
 from torchvision.models.feature_extraction import create_feature_extractor
 
 class FaceEncoderResnet(nn.Module):
-    def __init__(self, hidden_dim=512 * 7 * 7, dropout=0.4):
+    def __init__(self, hidden_dim=512, dropout=0.4):
         super().__init__()
         return_nodes = {
             "layer4.1.bn2": "features"
