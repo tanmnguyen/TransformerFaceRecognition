@@ -42,7 +42,8 @@ def main(args):
     encoder.requires_grad_(False)
 
     # reconstruction model
-    b, enc_len = encoder(torch.randn(1, 3, 224, 224)).shape
+    with torch.no_grad():
+        _, enc_len = encoder(torch.randn(1, 3, 224, 224).to(settings.device)).shape
     model = FaceReconstruction(enc_len, 7, 7, 512, 3, 224, 224).to(settings.device)
 
     log(model)
