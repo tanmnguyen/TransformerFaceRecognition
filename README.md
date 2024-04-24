@@ -29,3 +29,7 @@ CUDA_VISIBLE_DEVICES=0 python trainReconstruction.py --config configs/CelebA-dat
 ```bash 
 CUDA_VISIBLE_DEVICES=0 python trainReconstruction.py --config configs/CelebA-resnet_dat-recon.cfg
 ```
+
+```bash 
+CUDA_VISIBLE_DEVICES=0 python trainReconstruction.py --config configs/CelebA-resnet-recon.cfg
+```
