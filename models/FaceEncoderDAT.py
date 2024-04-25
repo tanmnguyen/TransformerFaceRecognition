@@ -108,6 +108,11 @@ class FaceEncoderDat(nn.Module):
         if encoder_weight_path is not None:
             self.dat = load_state_dict(self.dat, encoder_weight_path)
 
+    def get_fine_tuned_param_groups(self):
+        return [
+            {"params": self.dat.stages[-1].parameters(), "lr": 1e-4}
+        ]
+    
     def forward(self, x):
         # extract features
         features = self.dat.extract_features(x)
