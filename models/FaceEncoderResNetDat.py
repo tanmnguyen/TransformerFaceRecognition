@@ -95,6 +95,13 @@ class FaceEncoderResnetDat(nn.Module):
         
         return out
     
+
+    def get_fine_tuned_param_groups(self):
+        # only return fc layer for fine tuning
+        return [
+            {"params": self.fc.parameters(), "lr": 1e-4}
+        ]
+    
     def get_param_groups(self):
         resnet_lr = 1e-4 
         ndat_lr = 1e-3
