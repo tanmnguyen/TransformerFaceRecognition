@@ -25,6 +25,11 @@ python trainClassifier.py --config configs/CelebA.cfg --encoder-weight /Users/ta
 ```
 python trainFaceReconSiamese.py --config configs/CelebA-resnet_dat-recon.cfg
 ```
+
+```
+python trainFaceReconSiamese.py --config configs/CelebA-resnet-recon.cfg
+```
+
 ## Train reconstruction net 
 ```bash 
 CUDA_VISIBLE_DEVICES=0 python trainReconstruction.py --config configs/CelebA-dat-tiny-recon.cfg

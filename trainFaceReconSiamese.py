@@ -62,7 +62,7 @@ def main(args):
         valid_history.append(valid_siamese_net(model, valid_dataloader, epoch, settings.siamese_epochs))
 
         # save every epoch 
-        torch.save(model.state_dict(), os.path.join(f"{settings.result_path}", f"siamese_net_epoch_{epoch}.pth"))
+        torch.save(model.state_dict(), os.path.join(f"{settings.result_path}", f"siamese-net_epoch_{epoch}.pth"))
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')

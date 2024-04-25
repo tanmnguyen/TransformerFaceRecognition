@@ -14,6 +14,12 @@ class FaceEncoderResnet(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(512 * 7 * 7 , hidden_dim)
 
+    def get_fine_tuned_param_groups(self):
+        # only return fc layer for fine tuning
+        return [
+            {"params": self.fc.parameters(), "lr": 1e-4}
+        ]
+
     def forward(self, x):
         # extract features 
         x = self.cnn(x)['features']

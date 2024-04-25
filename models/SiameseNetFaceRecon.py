@@ -16,10 +16,12 @@ class SiameseNetFaceRecon(nn.Module):
         recon_loss = self.face_recon.loss(recon, anchor)
 
         loss = loss + recon_loss * 0.1
-        return loss, dis_pos, dis_neg
+        return loss, dis_pos, dis_neg, recon_loss 
     
     def get_param_groups(self, default_lr):
         try:
-            return self.encoder.get_fine_tuned_param_groups()
+            return self.encoder.get_fine_tuned_param_groups() + [
+                {"params": self.face_recon.parameters(), "lr": default_lr}
+            ]
         except:
             return [{"params": self.encoder.parameters(), "lr": default_lr}]
