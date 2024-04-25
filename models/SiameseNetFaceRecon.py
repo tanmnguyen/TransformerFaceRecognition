@@ -10,13 +10,13 @@ class SiameseNetFaceRecon(nn.Module):
         anchor_latent   = self.encoder(anchor)
         positive_latent = self.encoder(positive)
         negative_latent = self.encoder(negative)
-        loss = self.loss(anchor_latent, positive_latent, negative_latent)
+        loss, dis_pos, dis_neg = self.loss(anchor_latent, positive_latent, negative_latent)
 
         recon = self.face_recon(anchor_latent)
         recon_loss = self.face_recon.loss(recon, anchor)
 
         loss = loss + recon_loss * 0.1
-        return loss 
+        return loss, dis_pos, dis_neg
     
     def get_param_groups(self, default_lr):
         try:
