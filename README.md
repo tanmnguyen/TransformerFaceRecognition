@@ -46,3 +46,8 @@ CUDA_VISIBLE_DEVICES=0 python trainReconstruction.py --config configs/CelebA-res
 ```bash 
 CUDA_VISIBLE_DEVICES=0 python trainReconstruction.py --config configs/CelebA-resnet-recon.cfg
 ```
+
+## Visualize Reconstruction Result 
+```bash 
+python visualizeReconstruction.py --config configs/CelebA-resnet-recon.cfg --weight /Users/tan/Desktop/results/resnet18-2024-04-25-01-54-33/siamese-net_epoch_9.pth --image data/CelebA/test/6219/185746.jpg
+```

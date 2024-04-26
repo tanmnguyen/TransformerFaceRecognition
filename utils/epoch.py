@@ -133,7 +133,7 @@ def valid_siamese_net(model, valid_dataloader, epoch, total_epochs):
             triplet_acc = (dis_pos < dis_neg).sum().item() / len(dis_pos)
             epoch_acc += triplet_acc
     
-    log(f"[Train] Epoch {epoch+1}/{total_epochs}: " + \
+    log(f"[Valid] Epoch {epoch+1}/{total_epochs}: " + \
         f"| Loss: {epoch_loss / len(valid_dataloader)} " + \
         f"| Acc: {epoch_acc / len(valid_dataloader)} " + \
         f"| Recon Loss: {epoch_recon_loss / len(valid_dataloader)} "

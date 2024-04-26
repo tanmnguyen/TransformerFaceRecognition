@@ -6,7 +6,6 @@ from models.SiameseNet import SiameseNet
 from models.TripletLoss import TripletLoss
 
 def get_encoder_from_siamese(arch: str, weight: str):
-    print(weight)
     if arch == "resnet18":
         from models.FaceEncoderResnet import FaceEncoderResnet
         encoder = FaceEncoderResnet()
@@ -51,7 +50,9 @@ def get_encoder_from_siamese(arch: str, weight: str):
     else:
         raise ValueError(f"arch {arch} not supported")
     model = SiameseNet(encoder=encoder, loss=TripletLoss())
-    model.load_state_dict(torch.load(weight, map_location=torch.device('cpu')))
+    
+    if weight is not None:
+        model.load_state_dict(torch.load(weight, map_location=torch.device('cpu')))
 
     model = model.encoder
     return model
