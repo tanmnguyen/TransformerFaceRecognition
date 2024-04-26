@@ -110,7 +110,7 @@ class FaceEncoderDat(nn.Module):
 
     def get_fine_tuned_param_groups(self):
         return [
-            {"params": self.dat.stages[-1].parameters(), "lr": 1e-4}
+            {"params": self.dat.stages[-1].mlps[-1].parameters(), "lr": 1e-4}
         ]
     
     def forward(self, x):
