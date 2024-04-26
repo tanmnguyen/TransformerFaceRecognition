@@ -15,6 +15,10 @@ from settings import settings
 from torch.utils.data import DataLoader
 from datasets.TripleFaceDataset import TripleFaceDataset
 
+from utils.selection import get_encoder_from_siamese
+from models.FaceReconstruction import FaceReconstruction
+from models.SiameseNetFaceRecon import SiameseNetFaceRecon
+
 def main(args):
     settings.update_config(args.config)
 
@@ -27,9 +31,25 @@ def main(args):
     )
 
     # load model 
-    encoder = get_encoder(settings.arch, settings.encoder_weight_path)
-    model = SiameseNet(encoder=encoder, loss=TripletLoss())
-    model.to(settings.device)
+    try:
+        encoder = get_encoder(settings.arch, settings.encoder_weight_path)
+        model = SiameseNet(encoder=encoder, loss=TripletLoss())
+        model.to(settings.device)
+
+        # try if the weight can be loaded
+        model.load_state_dict(torch.load(
+                os.path.join(args.checkpoint, f"siamese_net_epoch_{0}.pth"), 
+                map_location=settings.device
+            )
+        )
+    except:
+        encoder = get_encoder_from_siamese(settings.arch, None)
+        encoder = encoder.to(settings.device)
+        with torch.no_grad():
+            _, enc_len = encoder(torch.randn(1, 3, 224, 224).to(settings.device)).shape
+        face_recon = FaceReconstruction(enc_len, 7, 7, 512, 3, 224, 224).to(settings.device)
+        model = SiameseNetFaceRecon(encoder=encoder, loss=TripletLoss(), face_recon=face_recon)
+        model.to(settings.device)
 
     log(model)
     log(f"Test set size: {len(test_ds)}")

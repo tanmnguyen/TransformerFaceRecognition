@@ -14,14 +14,6 @@ from settings import settings
 def main(args):
     settings.update_config(args.config)
 
-    # test_ds = TripleFaceDataset(settings.test_path)
-    # test_dataloader = DataLoader(
-    #     test_ds, 
-    #     batch_size=int(settings.batch_size), 
-    #     collate_fn=siamese_collate_fn, 
-    #     shuffle=True
-    # )
-
     #load model 
     encoder = get_encoder_from_siamese(settings.arch, None)
     encoder = encoder.to(settings.device)
