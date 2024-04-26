@@ -109,6 +109,11 @@ class FaceEncoderDat(nn.Module):
             self.dat = load_state_dict(self.dat, encoder_weight_path)
 
     def get_fine_tuned_param_groups(self):
+        # freeze the entire network except for the fine tuning layer 
+        for param in self.dat.parameters():
+            param.requires_grad = False
+
+        self.dat.stages[-1].mlps[-1].requires_grad = True
         return [
             {"params": self.dat.stages[-1].mlps[-1].parameters(), "lr": 1e-4}
         ]
