@@ -10,8 +10,8 @@ class SiameseNet(nn.Module):
         anchor_latent   = self.encoder(anchor)
         positive_latent = self.encoder(positive)
         negative_latent = self.encoder(negative)
-        loss = self.loss(anchor_latent, positive_latent, negative_latent)
-        return loss 
+        loss, dis_pos, dis_neg = self.loss(anchor_latent, positive_latent, negative_latent)
+        return loss, dis_pos, dis_neg, torch.tensor(0.0)
     
     def get_param_groups(self, default_lr):
         try:
